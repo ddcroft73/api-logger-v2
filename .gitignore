@@ -1,3 +1,4 @@
-/logs
+logs
 core/__pycache__
 logger/__pycache__
+myenv
