@@ -21,11 +21,15 @@ from datatime import datetime, timezone
 
 # The first 3 args are postional, after that they are all Kwargs.
 logger.delay(
-    Stream,     # "INFO", "ERROR", or any other stream
-    Location,   # Username or "system"
-    Message, 
+    stream,     # "INFO", "ERROR", or any other stream
+    location,   # Username or "system"
+    message, 
     **kwargs    # tinmestamp, heading, dict_to_string, m
 )
+# Since the log entries are turned over to Celery, Celery actually puts the task in a queue and executes
+# THen in the order they were received, so you don't actually call a method on the logger class. this is abstracted away
+# and done by Celery at the right time. Hence the call to "delay()"
+
 
 # If you call it with no positionals, and just an "m" kwarg:
 # This will result in a system INFO stream message
