@@ -20,7 +20,7 @@ from datatime import datetime, timezone
 # The first 3 args are postional, after that they are all Kwargs.
 logger.delay(
     <stream>,                 # "INFO", "ERROR", or any other stream
-    <username> || <system>,   # Username or "system"
+    <username> || "system",   # Username or "system"
     <message>,                # Da message.
     <kwargs>                  # tinmestamp, heading, dict_to_string, m
 )
@@ -36,7 +36,7 @@ logger.delay(m="This log entry will go under INFO for the system.")
 # Basic Logger usage and entry syntax.
 # Log an INFO Stream message for the current active user on the system.
 logger.delay("INFO", current_active_user, "Log entry here.", timestamp=True)
-# Log an ERROR Stream message for the System. Non user specific
+# Log an ERROR Stream message for the System. Non user paspefic
 logger.delay("ERROR", "system", "Log entry here.", timestamp=True)
 
 # Results:
