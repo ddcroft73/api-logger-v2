@@ -1,17 +1,15 @@
-
-
 ## API Logger V2
 
-A logger designed for user based web API systems. Logs events for each user independantly. Uses a robust task queue system, Celery to make certain no system, or user log is ever missed no matter how big, or busy your backend is.  Very simple operation and setup. It operates and logs data under a "stream" system. Streams are nothing more than a file that holds a certin type of log entry, and you can add or delete your own streams. The default streams are:
+A logger designed for user based web API systems. Logs events for each user independantly. Uses a robust task queue system, Celery to make certain no system, or user log is ever missed no matter how big, or busy your backend is.  Very simple operation and setup. It operates and logs data under a "stream" system. Streams are nothing more than a file that holds a certain type of log entry, and you can add or delete your own streams. There will be a CLI stream editor that you can use to add/delete streams as your system requires. The default streams are listed below and remember, the users have their own directory in the `logs` directory under `logs/users/<USERNAME>/` . There will be a file representing each one of the below streams. The premise is every action on the system belongs to either a user, or the system. This way you know who was behind the wheel when an error happens, or You can see who did what when something else happens or goe wrong. ANd you dont need to comb through hundreds of logs to find out  what happened. 
 
-* INFO
-* WARN
-* DEBUG
-* LOGIN
-* ERROR
-* SECURITY ALERT
-* STRANGE ACTIVITY
-* INTERNAL
+* **INFO** ::  This can really encompass almost anything.  User info, activity, system info, update info. Pretty much anything.
+* **WARN** ::  Any type warning you need to log.
+* **DEBUG**  :: Exactly what it says. A place to send debugging/troubleshooting code.
+* **LOGIN** ::  Anything to do with a user logging in or out. How many attempts they made, the IP they came from, etc, etc...
+* **ERROR**  :: Arguably the most useful of all. A place to log any and all errors. This can be expanded on with the Stream editior, or you can just use this one to encompass them all.
+* **STRANGE_ACTIVITY**  ::  Anything odd this user has been doing? Any odd happens on the sytem?
+* **INTERNAL**  :: This is where the logger will report any internal errors or messages it experiences.
+* **PRINT TO SCREEN**  :: Yes you can also print to the screen. This is not a STREAM so to speak, but A method rather that you send to the screen with a stream selected, and a user or system in mind.
 
 Internal is just what it sounds like and is automatic. it is how any error or message from within the logger is handled.  This is the only one that needs to be left as is, but I have had issues with it in the past. I'm trying to figure out how I can keep it because it is necessary. So You can see the default interface is a lot like any other logger but it works totally different. You dont need to worry about levels and only being able to log certain levels at certain times or altogether.  If you want to log INFO, you simply set that as the "stream" and give it your message. ERROR, same. Below is a simple example of how to use it in a python application.
 
@@ -21,30 +19,42 @@ from datatime import datetime, timezone
 
 # The first 3 args are postional, after that they are all Kwargs.
 logger.delay(
-    stream,     # "INFO", "ERROR", or any other stream
-    location,   # Username or "system"
-    message, 
-    **kwargs    # tinmestamp, heading, dict_to_string, m
+    <stream>,                 # "INFO", "ERROR", or any other stream
+    <username> || <system>,   # Username or "system"
+    <message>,                # Da message.
+    <kwargs>                  # tinmestamp, heading, dict_to_string, m
 )
-# Since the log entries are turned over to Celery, Celery actually puts the task in a queue and executes
-# THen in the order they were received, so you don't actually call a method on the logger class. this is abstracted away
-# and done by Celery at the right time. Hence the call to "delay()"
+# Since the log entries are turned over to Celery, Celery actually puts the 
+# task in a queue and executes them in the order they were received, so you 
+# don't actually call a method on the logger class. This is abstracted away
+# and done by Celery at the right time. Hence the call to "delay()".
 
-
-# If you call it with no positionals, and just an "m" kwarg:
+# If you call it with no positionals, and just: m="Log entry message here."
 # This will result in a system INFO stream message
 logger.delay(m="This log entry will go under INFO for the system.")
 
+# Basic Logger usage and entry syntax.
+# Log an INFO Stream message for the current active user on the system.
 logger.delay("INFO", current_active_user, "Log entry here.", timestamp=True)
+# Log an ERROR Stream message for the System. Non user specific
 logger.delay("ERROR", "system", "Log entry here.", timestamp=True)
 
 # Results:
 # a simple one line log entry.
-INFO:  Log entry here. § [2024-04-09 20:39:05]
+INFO:  Log entry here. § [2024-04-09 20:39:05]    # No mention of the user, 
+                                                  # but it willbe in this users 
+                                                  # log directory
+ERROR:  Log entry here. § [2024-04-09 20:39:05]   # No mention of the System,
+                                                  # but stored in the System 
+                                                  # log directory.
 
 
-# This allows you to log your entry in JSON (Sort of) format. Some entries are just better read this way and it allows
-# you better control over the data. 
+# This allows you to log your entry in JSON (Sort of) format. Some entries 
+# are just better read this way and it allows you better control over the data. 
+# Yes this feature is a bit more involved, but it comes naturally once you've 
+# done 4,258 of them. joking... But the layout here really is handy for logging 
+# detailed data. 
+
 user_data_dict = {
     "username": "usera1@gizzleMail.com",
     "IP_Address": "200.88.45.102",
@@ -55,7 +65,7 @@ logger.delay(
     "LOGIN",                         # stream
     user_data_dict.get("username"),  # The user to log it under
     user_data_dict,                  # THe dictionary
-    dict_to_string=True,             # This tells it to format like JSON, else it will be one line
+    dict_to_string=True,             # This tells it to format like JSON.
     heading="New Login",             # Optional heading over the readout.
 )
 
@@ -66,10 +76,10 @@ LOGIN: New Login
     "ip_address": "200.88.45.102",
     "time_in": "04/09/2024 21:08:10",
 }
+
+## Print a messsage to the screen with a stream and user or system in mind:
+logger.delay("SCREEN,INFO", <username> || <system>, "Log entry message here.", <kwargs>)
 ```
-
-
-
 
 # The Idea
 
