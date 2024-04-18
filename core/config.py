@@ -16,14 +16,28 @@ class Settings:
 
 settings = Settings()
 
+
+#
+#   A very basic representation of the logging directories for useres and System
+#
 # logs/
 #    |
 #    --users/
-#        |
-#        --userone@gmail.com
-#                   |
-#                   ---INFO_log.log
-#                   |
-#                   ---WARN_log.log  # etc, etc 
+#    |    |
+#    |    --userone@gmail.com
+#    |    |           |
+#    |    |           ---INFO_log.log
+#    |    |           |
+#    |    |           ---WARN_log.log  # etc, etc 
+#    |    |
+#    |    ---userTwo@gmail.com
+#    |                |
+#    |                ---INFO_log.log
+#    |                |
+#    |                ---WARN_log.log  # etc, etc 
 #    |
 #    --sys/
+#       |
+#       ---INFO_log.log
+#       |
+#       ---WARN_log.log  # etc, etc
