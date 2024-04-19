@@ -35,10 +35,9 @@ class Stream:
     WARN: int = 40                #   WARNINGS
     LOGIN: int = 50               #   Anything to do with a user logging in, How many attempts, loggout etc. 
     
-    SECURITY_ALERTS: int = 70     #  Security related for the user or system. Again, up to the dev to define.
-    STRANGE_ACTIVITY: int = 80    #  A stream to log strange goings on. What? Up to the dev to define, but they go here.
+    STRANGE_ACTIVITY: int = 60    #  A stream to log strange goings on. What? Up to the dev to define, but they go here.
 
-    INTERNAL: int = 90            #  This is for any errros associated with the logger itself. I have had "iffy" 
+    INTERNAL: int = 70            #  This is for any errros associated with the logger itself. I have had "iffy" 
                                   #  results with this in the past. Let me see if I can shake it out this time.
 
     class Prefix:
@@ -48,7 +47,6 @@ class Stream:
         WARN_PRE: str =  "WARNING: "
         LOGIN_PRE: str = 'LOGIN: '
         
-        SECURITY_PRE: str = 'SECURITY: '
         STRANGE_ACTIVITY_PRE: str = "STRANGE ACTIVITY: "
 
         INERNAL_PRE: str = "[ INTERNAL ]: "
@@ -95,7 +93,6 @@ class Archive():
         WARN_DIR: str = "warn"
         ERROR_DIR: str = "error"
         LOGIN_DIR: str = "login"
-        SECURITY_DIR: str = "security"
         STRANGE_ACTIVITY_DIR: str = "strange-activity"
 
         @classmethod
@@ -171,8 +168,6 @@ class Archive():
             sub_dir = self.ArchiveSubDirectories.WARN_DIR
         elif stream == Stream.LOGIN:
             sub_dir = self.ArchiveSubDirectories.LOGIN_DIR
-        elif stream == Stream.SECURITY_ALERTS:
-            sub_dir = self.ArchiveSubDirectories.SECURITY_DIR
         elif stream == Stream.STRANGE_ACTIVITY:
             sub_dir = self.ArchiveSubDirectories.STRANGE_ACTIVITY_DIR
 
@@ -284,6 +279,7 @@ class APILogger_v2():
             self.warning_filename =  kwargs.get('warning_filename')
             self.debug_filename =  kwargs.get('debug_filename')
             self.login_filename =  kwargs.get('login_filename')
+            self.strange_activity_filename =  kwargs.get('strange_activity_filename')
 
             self.archive_log_files =  kwargs.get('archive_log_files')
             self.log_file_max_size =  kwargs.get('log_file_max_size')    # DEBUGING=5     
@@ -313,7 +309,8 @@ class APILogger_v2():
             self.warning_filename,
             self.debug_filename,
             self.internal_filename,
-            self.login_filename
+            self.login_filename,
+            self.strange_activity_filename,
         ]
         
 
@@ -414,6 +411,8 @@ class APILogger_v2():
             msg_prefix = Stream.Prefix.ERROR_PRE
         elif stream == Stream.LOGIN:
             msg_prefix = Stream.Prefix.LOGIN_PRE
+        elif stream == Stream.STRANGE_ACTIVITY:
+            msg_prefix = Stream.Prefix.STRANGE_ACTIVITY_PRE
         elif stream == 0:
             msg_prefix=""
 
@@ -543,6 +542,28 @@ class APILogger_v2():
             self.login_filename
         )      
 
+    def strange_activity(self,
+        message: str, 
+        timestamp: bool = False, 
+        dict_to_string: bool = False,
+        heading: Optional[str] = None
+    ) -> None:
+        
+        if dict_to_string: 
+            message = self.__format_dict_string(message)
+        
+        if heading:
+            Stream.Prefix.STRANGE_ACTIVITY_PRE = f"{Stream.Prefix.STRANGE_ACTIVITY_PRE}{heading}\n"
+
+        message = f"{Stream.Prefix.STRANGE_ACTIVITY_PRE} {message}"
+        self.__save_log_entry(
+            message,
+            Stream.STRANGE_ACTIVITY,
+            timestamp,
+            self.strange_activity_filename
+        )      
+
+
     def internal(self, stream2: int, message: str, timestamp: bool = False) -> None:
         # Brand the message
         message = f'{Stream.Prefix.INTERNAL_PRE}  {stream2} {message}'
@@ -589,7 +610,12 @@ class APILogger_v2():
   
 
 logzz = APILogger_v2( 
-    info_filename="INFO_logzz.log", debug_filename="DEBUG_logzz.log", error_filename="ERROR_logzz.log", login_filename="LOGIN_logzz.log", warning_filename=None,  
+    info_filename="INFO_logzz.log", 
+    debug_filename="DEBUG_logzz.log", 
+    error_filename="ERROR_logzz.log", 
+    login_filename="LOGIN_logzz.log", 
+    warning_filename="WARN_logzz.log",  
+    strange_activity_filename="STRANGE_logzz.log",
     archive_log_files=True,
     log_file_max_size=3000,   
 )

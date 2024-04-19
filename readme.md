@@ -13,7 +13,32 @@ A logger designed for user based web API systems. Logs events for each user inde
 
 Internal is just what it sounds like and is automatic. it is how any error or message from within the logger is handled.  This is the only one that needs to be left as is, but I have had issues with it in the past. I'm trying to figure out how I can keep it because it is necessary. So You can see the default interface is a lot like any other logger but it works totally different. You dont need to worry about levels and only being able to log certain levels at certain times or altogether.  If you want to log INFO, you simply set that as the "stream" and give it your message. ERROR, same. Below is a simple example of how to use it in a python application.
 
+# Basic Usage:
+
+The logger is built off of a singleton class instance. It is instantiated at the bottom of the class definition, and this is where you can set the names of your Stream files.  The come already set with thoughtful default names, archiving is set to True and the max file length is set to 3000 lines.  The code looks like this:
+
 ```python
+logzz = APILogger_v2( 
+    info_filename="INFO_logzz.log", 
+    debug_filename="DEBUG_logzz.log", 
+    error_filename="ERROR_logzz.log", 
+    login_filename="LOGIN_logzz.log", 
+    warning_filename="WARN_logzz.log",  
+    strange_activity_filename="STRANGE_logzz.log",
+    archive_log_files=True,
+    log_file_max_size=3000,   
+)
+
+# Any changes can be made here before running your API. The first thing the 
+# logger will do is set up all the directories, This happens on instantiation,
+# and instantiation happens when you inport the logger. THe app is setup so 
+# so that Celery and all tasks are primed and redy to go whenever you spin 
+# up your API
+
+```
+
+```python
+
 from app.logger.celery_app import logger
 from datatime import datetime, timezone
 
